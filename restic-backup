@@ -1,0 +1,22 @@
+#!/bin/bash
+
+if pgrep -f 'restic backup' > /dev/null; then
+  echo 'restic is already running...' 1>&2
+  exit 0
+fi
+
+set -e
+set -v
+
+export RESTIC_REPOSITORY='sftp:blacknas:/snapshots'
+export RESTIC_PASSWORD_COMMAND='/usr/local/bin/get-restic-password'
+export RESTIC_COMPRESSION='auto'
+export RESTIC_CACHE_DIR='/var/cache/restic'
+
+mkdir -p "${RESTIC_CACHE_DIR}"
+
+restic unlock 
+restic backup --files-from=/etc/restic/includes.txt --tag scheduled
+restic check --with-cache --read-data-subset=5G
+restic forget --prune --keep-daily 7 --keep-weekly 4 --keep-monthly 6 --keep-yearly 3
+

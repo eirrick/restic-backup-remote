@@ -1,0 +1,9 @@
+
+/etc
+/home
+/root
+/var
+/srv
+/boot
+/usr/local
+
