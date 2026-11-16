@@ -31,6 +31,7 @@ RestrictRealtime=yes
 RestrictSUIDSGID=yes
 SystemCallFilter=@system-service
 ReadWritePaths=/var/cache/restic
+ReadWritePaths=/etc/restic
 UMask=7007
 
 ExecStart=/usr/local/bin/restic-backup

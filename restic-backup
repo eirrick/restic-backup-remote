@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if pgrep -f 'restic backup' > /dev/null; then
+if pgrep -f 'restic backup' >/dev/null; then
   echo 'restic is already running...' 1>&2
   exit 0
 fi
@@ -15,8 +15,15 @@ export RESTIC_CACHE_DIR='/var/cache/restic'
 
 mkdir -p "${RESTIC_CACHE_DIR}"
 
-restic unlock 
+RESTIC_PARAM_DIR=/etc/restic
+
+pacman -Qqen >"$RESTIC_PARAM_DIR/pkglist.txt"
+
+if ! pacman -Qqem >"$RESTIC_PARAM_DIR/foreignpkglist.txt"; then
+  echo "INFO: System doesn't have any foreign packages installed."
+fi
+
+restic unlock
 restic backup --files-from=/etc/restic/includes.txt --tag scheduled
 restic check --with-cache --read-data-subset=5G
 restic forget --prune --keep-daily 7 --keep-weekly 4 --keep-monthly 6 --keep-yearly 3
-
